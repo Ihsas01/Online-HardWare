@@ -56,6 +56,80 @@ try {
     $error = "An error occurred while fetching products.";
 }
 
+// Handle AJAX requests
+if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
+    // Return only the products grid for AJAX requests
+    if (isset($error)) {
+        echo '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>' . $error . '</div>';
+    } else {
+        if (!empty($products)) {
+            echo '<div class="row g-4">';
+            foreach ($products as $index => $product) {
+                echo '<div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="' . ($index * 100) . '">';
+                echo '<div class="product-card">';
+                echo '<div class="product-image">';
+                if (!empty($product['image'])) {
+                    echo '<img src="' . htmlspecialchars($product['image']) . '" alt="' . htmlspecialchars($product['name']) . '">';
+                } else {
+                    echo '<div class="product-placeholder"><i class="fas fa-tools"></i></div>';
+                }
+                echo '<div class="product-overlay">';
+                echo '<div class="product-actions">';
+                echo '<a href="product.php?id=' . $product['id'] . '" class="btn btn-primary btn-sm"><i class="fas fa-eye me-1"></i>View</a>';
+                echo '<button class="btn btn-outline-light btn-sm quick-view-btn" data-product-id="' . $product['id'] . '"><i class="fas fa-search me-1"></i>Quick</button>';
+                echo '</div>';
+                echo '</div>';
+                echo '<div class="product-badges">';
+                echo '<span class="badge bg-success">In Stock</span>';
+                if ($product['price'] < 50) {
+                    echo '<span class="badge bg-warning">Best Value</span>';
+                }
+                echo '</div>';
+                echo '</div>';
+                echo '<div class="product-content">';
+                echo '<div class="product-category"><i class="fas fa-tag me-1"></i>' . htmlspecialchars($product['category_name']) . '</div>';
+                echo '<h5 class="product-title">' . htmlspecialchars($product['name']) . '</h5>';
+                echo '<p class="product-description">' . htmlspecialchars(substr($product['description'], 0, 80)) . '...</p>';
+                echo '<div class="product-rating">';
+                echo '<div class="stars">';
+                echo '<i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>';
+                echo '</div>';
+                echo '<span class="rating-text">(4.5)</span>';
+                echo '</div>';
+                echo '<div class="product-footer">';
+                echo '<div class="product-price">$' . number_format($product['price'], 2) . '</div>';
+                echo '<div class="product-actions-footer">';
+                echo '<a href="product.php?id=' . $product['id'] . '" class="btn btn-primary btn-sm">View Details</a>';
+                if (isLoggedIn()) {
+                    echo '<button class="btn btn-outline-primary btn-sm add-to-cart-btn" onclick="addToCart(' . $product['id'] . ')"><i class="fas fa-shopping-cart"></i></button>';
+                }
+                echo '</div>';
+                echo '</div>';
+                echo '</div>';
+                echo '</div></div>';
+            }
+            echo '</div>';
+        } else {
+            echo '<div class="empty-state" data-aos="fade-up">';
+            echo '<div class="empty-icon"><i class="fas fa-box-open"></i></div>';
+            echo '<h3 class="empty-title">No products found</h3>';
+            echo '<p class="empty-subtitle">';
+            if ($searchQuery) {
+                echo 'No products match your search "' . htmlspecialchars($searchQuery) . '"';
+            } else {
+                echo 'Please check back later for updates';
+            }
+            echo '</p>';
+            echo '<div class="empty-actions">';
+            echo '<a href="products.php" class="btn btn-primary"><i class="fas fa-refresh me-2"></i>Clear Filters</a>';
+            echo '<a href="contact.php" class="btn btn-outline-primary"><i class="fas fa-envelope me-2"></i>Contact Us</a>';
+            echo '</div>';
+            echo '</div>';
+        }
+    }
+    exit; // Stop execution for AJAX requests
+}
+
 include 'includes/header.php';
 ?>
 
@@ -176,8 +250,10 @@ include 'includes/header.php';
                         </div>
                         <div class="filter-content">
                             <div class="category-filter">
-                                <a href="products.php<?php echo $searchQuery ? '?search=' . urlencode($searchQuery) : ''; ?>" 
-                                   class="category-item <?php echo !$categoryId ? 'active' : ''; ?>">
+                                <a href="#" 
+                                   class="category-item <?php echo !$categoryId ? 'active' : ''; ?>"
+                                   data-category-id=""
+                                   data-category-name="All Products">
                                     <div class="category-icon">
                                         <i class="fas fa-th-large"></i>
                                     </div>
@@ -187,8 +263,10 @@ include 'includes/header.php';
                                     </div>
                                 </a>
                                 <?php foreach ($categories as $category): ?>
-                                    <a href="products.php?category=<?php echo $category['id']; ?><?php echo $searchQuery ? '&search=' . urlencode($searchQuery) : ''; ?>" 
-                                       class="category-item <?php echo $categoryId === $category['id'] ? 'active' : ''; ?>">
+                                    <a href="#" 
+                                       class="category-item <?php echo $categoryId === $category['id'] ? 'active' : ''; ?>"
+                                       data-category-id="<?php echo $category['id']; ?>"
+                                       data-category-name="<?php echo htmlspecialchars($category['name']); ?>">
                                         <div class="category-icon">
                                             <i class="fas <?php echo !empty($category['icon']) ? htmlspecialchars($category['icon']) : 'fa-tools'; ?>"></i>
                                         </div>
@@ -232,15 +310,15 @@ include 'includes/header.php';
                         </div>
                         <div class="filter-content">
                             <div class="quick-actions">
-                                <a href="products.php?sort=price&order=asc" class="quick-action-item">
+                                <a href="#" class="quick-action-item" data-sort="price" data-order="asc">
                                     <i class="fas fa-sort-amount-down"></i>
                                     <span>Lowest Price</span>
                                 </a>
-                                <a href="products.php?sort=price&order=desc" class="quick-action-item">
+                                <a href="#" class="quick-action-item" data-sort="price" data-order="desc">
                                     <i class="fas fa-sort-amount-up"></i>
                                     <span>Highest Price</span>
                                 </a>
-                                <a href="products.php" class="quick-action-item">
+                                <a href="#" class="quick-action-item" id="clearFilters">
                                     <i class="fas fa-refresh"></i>
                                     <span>Clear Filters</span>
                                 </a>
@@ -263,7 +341,7 @@ include 'includes/header.php';
                 <div class="results-header mb-4" data-aos="fade-up">
                     <div class="row align-items-center">
                         <div class="col-md-6">
-                            <h4 class="results-title">
+                            <h4 class="results-title" id="currentCategoryTitle">
                                 <?php if ($categoryId): ?>
                                     <?php 
                                     $currentCategory = array_filter($categories, function($cat) use ($categoryId) {
@@ -276,7 +354,7 @@ include 'includes/header.php';
                                     All Products
                                 <?php endif; ?>
                             </h4>
-                            <p class="results-subtitle text-muted">
+                            <p class="results-subtitle text-muted" id="resultsCount">
                                 <?php echo count($products); ?> product<?php echo count($products) !== 1 ? 's' : ''; ?> found
                                 <?php if ($searchQuery): ?>
                                     for "<?php echo htmlspecialchars($searchQuery); ?>"
@@ -285,7 +363,7 @@ include 'includes/header.php';
                         </div>
                         <div class="col-md-6 text-md-end">
                             <div class="results-info">
-                                <span class="results-count"><?php echo count($products); ?> items</span>
+                                <span class="results-count" id="resultsCountSpan"><?php echo count($products); ?> items</span>
                                 <span class="results-sort">Sorted by <?php echo ucfirst($sortBy); ?></span>
                             </div>
                         </div>
@@ -293,7 +371,7 @@ include 'includes/header.php';
                 </div>
                 
                 <!-- Products Grid -->
-                <div class="products-grid" data-aos="fade-up" data-aos-delay="200">
+                <div class="products-grid" data-aos="fade-up" data-aos-delay="200" id="productsGrid">
                     <?php if (!empty($products)): ?>
                         <div class="row g-4">
                             <?php foreach ($products as $index => $product): ?>
@@ -438,6 +516,115 @@ include 'includes/header.php';
         easing: 'ease-out-cubic',
         once: true,
         offset: 100
+    });
+
+    // Category navigation without page reload
+    document.querySelectorAll('.category-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const categoryId = this.getAttribute('data-category-id');
+            const categoryName = this.getAttribute('data-category-name');
+            
+            // Update active state
+            document.querySelectorAll('.category-item').forEach(cat => cat.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Update URL without page reload
+            const url = new URL(window.location);
+            if (categoryId) {
+                url.searchParams.set('category', categoryId);
+            } else {
+                url.searchParams.delete('category');
+            }
+            window.history.pushState({}, '', url);
+            
+            // Update page content
+            updateProductsByCategory(categoryId, categoryName);
+        });
+    });
+
+    // Function to update products by category
+    function updateProductsByCategory(categoryId, categoryName) {
+        // Show loading state
+        const productsGrid = document.getElementById('productsGrid');
+        productsGrid.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+        
+        // Build the AJAX URL
+        let url = 'products.php?ajax=1';
+        if (categoryId) {
+            url += '&category=' + categoryId;
+        }
+        
+        // Get current search and sort parameters
+        const currentUrl = new URL(window.location);
+        const searchQuery = currentUrl.searchParams.get('search');
+        const sortBy = currentUrl.searchParams.get('sort');
+        const sortOrder = currentUrl.searchParams.get('order');
+        
+        if (searchQuery) url += '&search=' + encodeURIComponent(searchQuery);
+        if (sortBy) url += '&sort=' + sortBy;
+        if (sortOrder) url += '&order=' + sortOrder;
+        
+        // Fetch products
+        fetch(url)
+            .then(response => response.text())
+            .then(html => {
+                // Extract products HTML from response
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const newProductsGrid = doc.getElementById('productsGrid');
+                
+                if (newProductsGrid) {
+                    productsGrid.innerHTML = newProductsGrid.innerHTML;
+                    
+                    // Update results header
+                    const currentCategoryTitle = document.getElementById('currentCategoryTitle');
+                    const resultsCount = document.getElementById('resultsCount');
+                    const resultsCountSpan = document.getElementById('resultsCountSpan');
+                    
+                    if (currentCategoryTitle) {
+                        currentCategoryTitle.textContent = categoryName;
+                    }
+                    
+                    // Update counts
+                    const productCount = newProductsGrid.querySelectorAll('.product-card').length;
+                    if (resultsCount) {
+                        resultsCount.textContent = productCount + ' product' + (productCount !== 1 ? 's' : '') + ' found';
+                    }
+                    if (resultsCountSpan) {
+                        resultsCountSpan.textContent = productCount + ' items';
+                    }
+                    
+                    // Reinitialize AOS for new content
+                    AOS.refresh();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading products:', error);
+                productsGrid.innerHTML = '<div class="alert alert-danger">Error loading products. Please try again.</div>';
+            });
+    }
+
+    // Quick actions functionality
+    document.querySelectorAll('.quick-action-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const sort = this.getAttribute('data-sort');
+            const order = this.getAttribute('data-order');
+            
+            if (sort && order) {
+                // Update URL and reload with new sort
+                const url = new URL(window.location);
+                url.searchParams.set('sort', sort);
+                url.searchParams.set('order', order);
+                window.location.href = url.toString();
+            } else if (this.id === 'clearFilters') {
+                // Clear all filters
+                window.location.href = 'products.php';
+            }
+        });
     });
 
     // View toggle functionality

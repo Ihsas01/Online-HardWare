@@ -59,6 +59,7 @@ try {
 // Handle AJAX requests
 if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
     // Return only the products grid for AJAX requests
+    echo '<div class="products-grid" id="productsGrid">';
     if (isset($error)) {
         echo '<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>' . $error . '</div>';
     } else {
@@ -127,6 +128,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
             echo '</div>';
         }
     }
+    echo '</div>';
     exit; // Stop execution for AJAX requests
 }
 
@@ -518,54 +520,51 @@ include 'includes/header.php';
         offset: 100
     });
 
-    // Category navigation without page reload
-    document.querySelectorAll('.category-item').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            
-            const categoryId = this.getAttribute('data-category-id');
-            const categoryName = this.getAttribute('data-category-name');
-            
-            // Update active state
-            document.querySelectorAll('.category-item').forEach(cat => cat.classList.remove('active'));
-            this.classList.add('active');
-            
-            // Update URL without page reload
-            const url = new URL(window.location);
-            if (categoryId) {
-                url.searchParams.set('category', categoryId);
-            } else {
-                url.searchParams.delete('category');
-            }
-            window.history.pushState({}, '', url);
-            
-            // Update page content
-            updateProductsByCategory(categoryId, categoryName);
+    // Function to attach category click listeners
+    function attachCategoryListeners() {
+        document.querySelectorAll('.category-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const categoryId = this.getAttribute('data-category-id');
+                const categoryName = this.getAttribute('data-category-name');
+                // Update active state
+                document.querySelectorAll('.category-item').forEach(cat => cat.classList.remove('active'));
+                this.classList.add('active');
+                // Update URL without page reload
+                const url = new URL(window.location);
+                if (categoryId) {
+                    url.searchParams.set('category', categoryId);
+                } else {
+                    url.searchParams.delete('category');
+                }
+                window.history.pushState({}, '', url);
+                // Update page content
+                updateProductsByCategory(categoryId, categoryName);
+            });
         });
-    });
+    }
+
+    // Call on page load
+    attachCategoryListeners();
 
     // Function to update products by category
     function updateProductsByCategory(categoryId, categoryName) {
         // Show loading state
         const productsGrid = document.getElementById('productsGrid');
         productsGrid.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
-        
         // Build the AJAX URL
         let url = 'products.php?ajax=1';
         if (categoryId) {
             url += '&category=' + categoryId;
         }
-        
         // Get current search and sort parameters
         const currentUrl = new URL(window.location);
         const searchQuery = currentUrl.searchParams.get('search');
         const sortBy = currentUrl.searchParams.get('sort');
         const sortOrder = currentUrl.searchParams.get('order');
-        
         if (searchQuery) url += '&search=' + encodeURIComponent(searchQuery);
         if (sortBy) url += '&sort=' + sortBy;
         if (sortOrder) url += '&order=' + sortOrder;
-        
         // Fetch products
         fetch(url)
             .then(response => response.text())
@@ -574,19 +573,15 @@ include 'includes/header.php';
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
                 const newProductsGrid = doc.getElementById('productsGrid');
-                
                 if (newProductsGrid) {
                     productsGrid.innerHTML = newProductsGrid.innerHTML;
-                    
                     // Update results header
                     const currentCategoryTitle = document.getElementById('currentCategoryTitle');
                     const resultsCount = document.getElementById('resultsCount');
                     const resultsCountSpan = document.getElementById('resultsCountSpan');
-                    
                     if (currentCategoryTitle) {
                         currentCategoryTitle.textContent = categoryName;
                     }
-                    
                     // Update counts
                     const productCount = newProductsGrid.querySelectorAll('.product-card').length;
                     if (resultsCount) {
@@ -595,9 +590,10 @@ include 'includes/header.php';
                     if (resultsCountSpan) {
                         resultsCountSpan.textContent = productCount + ' items';
                     }
-                    
                     // Reinitialize AOS for new content
                     AOS.refresh();
+                    // Re-attach category listeners for new sidebar
+                    attachCategoryListeners();
                 }
             })
             .catch(error => {

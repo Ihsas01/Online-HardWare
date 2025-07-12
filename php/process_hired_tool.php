@@ -32,6 +32,15 @@ switch ($action) {
     case 'activate_tool':
         handleActivateTool($conn);
         break;
+    case 'add_hired_tool':
+        handleAddHiredTool($conn);
+        break;
+    case 'edit_hired_tool':
+        handleEditHiredTool($conn);
+        break;
+    case 'delete_hired_tool':
+        handleDeleteHiredTool($conn);
+        break;
     default:
         http_response_code(400);
         echo json_encode(['error' => 'Invalid action']);
@@ -285,6 +294,233 @@ function handleActivateTool($conn) {
         } else {
             http_response_code(400);
             echo json_encode(['error' => 'Failed to activate tool']);
+        }
+
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    }
+}
+
+function handleAddHiredTool($conn) {
+    if (!isAdmin()) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Admin access required']);
+        return;
+    }
+
+    $product_id = $_POST['product_id'] ?? '';
+    $user_id = $_POST['user_id'] ?? '';
+    $hire_date = $_POST['hire_date'] ?? '';
+    $return_date = $_POST['return_date'] ?? '';
+    $total_price = $_POST['total_price'] ?? '';
+    $status = $_POST['status'] ?? 'pending';
+    $admin_notes = $_POST['admin_notes'] ?? '';
+    
+    if (!$product_id || !$user_id || !$hire_date || !$return_date || !$total_price) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing required fields']);
+        return;
+    }
+
+    try {
+        // Check if product exists
+        $stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
+        $stmt->execute([$product_id]);
+        $product = $stmt->fetch();
+        
+        if (!$product) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Product not found']);
+            return;
+        }
+
+        // Check if user exists
+        $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch();
+        
+        if (!$user) {
+            http_response_code(400);
+            echo json_encode(['error' => 'User not found']);
+            return;
+        }
+
+        // Check if tool is already hired for the requested dates
+        $stmt = $conn->prepare("
+            SELECT COUNT(*) as count FROM hired_tools 
+            WHERE product_id = ? AND status IN ('pending', 'approved', 'active')
+            AND (
+                (hire_date BETWEEN ? AND ?) OR
+                (return_date BETWEEN ? AND ?) OR
+                (hire_date <= ? AND return_date >= ?)
+            )
+        ");
+        $stmt->execute([$product_id, $hire_date, $return_date, $hire_date, $return_date, $hire_date, $return_date]);
+        $existing = $stmt->fetch();
+        
+        if ($existing['count'] > 0) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Tool is already hired for the selected dates']);
+            return;
+        }
+
+        // Insert hired tool record
+        $stmt = $conn->prepare("
+            INSERT INTO hired_tools (product_id, user_id, hire_date, return_date, total_price, status, admin_notes, admin_approved_by, admin_approved_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())
+        ");
+        $stmt->execute([$product_id, $user_id, $hire_date, $return_date, $total_price, $status, $admin_notes, $_SESSION['user_id']]);
+
+        echo json_encode([
+            'success' => true,
+            'message' => 'Hired tool added successfully'
+        ]);
+
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    }
+}
+
+function handleEditHiredTool($conn) {
+    if (!isAdmin()) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Admin access required']);
+        return;
+    }
+
+    $hired_tool_id = $_POST['hired_tool_id'] ?? '';
+    $product_id = $_POST['product_id'] ?? '';
+    $user_id = $_POST['user_id'] ?? '';
+    $hire_date = $_POST['hire_date'] ?? '';
+    $return_date = $_POST['return_date'] ?? '';
+    $total_price = $_POST['total_price'] ?? '';
+    $status = $_POST['status'] ?? '';
+    $admin_notes = $_POST['admin_notes'] ?? '';
+    
+    if (!$hired_tool_id || !$product_id || !$user_id || !$hire_date || !$return_date || !$total_price || !$status) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing required fields']);
+        return;
+    }
+
+    try {
+        // Check if hired tool exists
+        $stmt = $conn->prepare("SELECT * FROM hired_tools WHERE id = ?");
+        $stmt->execute([$hired_tool_id]);
+        $hired_tool = $stmt->fetch();
+        
+        if (!$hired_tool) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Hired tool not found']);
+            return;
+        }
+
+        // Check if product exists
+        $stmt = $conn->prepare("SELECT * FROM products WHERE id = ?");
+        $stmt->execute([$product_id]);
+        $product = $stmt->fetch();
+        
+        if (!$product) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Product not found']);
+            return;
+        }
+
+        // Check if user exists
+        $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->execute([$user_id]);
+        $user = $stmt->fetch();
+        
+        if (!$user) {
+            http_response_code(400);
+            echo json_encode(['error' => 'User not found']);
+            return;
+        }
+
+        // Check if tool is already hired for the requested dates (excluding current record)
+        $stmt = $conn->prepare("
+            SELECT COUNT(*) as count FROM hired_tools 
+            WHERE product_id = ? AND id != ? AND status IN ('pending', 'approved', 'active')
+            AND (
+                (hire_date BETWEEN ? AND ?) OR
+                (return_date BETWEEN ? AND ?) OR
+                (hire_date <= ? AND return_date >= ?)
+            )
+        ");
+        $stmt->execute([$product_id, $hired_tool_id, $hire_date, $return_date, $hire_date, $return_date, $hire_date, $return_date]);
+        $existing = $stmt->fetch();
+        
+        if ($existing['count'] > 0) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Tool is already hired for the selected dates']);
+            return;
+        }
+
+        // Update hired tool record
+        $stmt = $conn->prepare("
+            UPDATE hired_tools 
+            SET product_id = ?, user_id = ?, hire_date = ?, return_date = ?, total_price = ?, status = ?, admin_notes = ?
+            WHERE id = ?
+        ");
+        $stmt->execute([$product_id, $user_id, $hire_date, $return_date, $total_price, $status, $admin_notes, $hired_tool_id]);
+
+        if ($stmt->rowCount() > 0) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Hired tool updated successfully'
+            ]);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Failed to update hired tool']);
+        }
+
+    } catch (Exception $e) {
+        http_response_code(500);
+        echo json_encode(['error' => 'Database error: ' . $e->getMessage()]);
+    }
+}
+
+function handleDeleteHiredTool($conn) {
+    if (!isAdmin()) {
+        http_response_code(403);
+        echo json_encode(['error' => 'Admin access required']);
+        return;
+    }
+
+    $hired_tool_id = $_POST['hired_tool_id'] ?? '';
+    
+    if (!$hired_tool_id) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing hired tool ID']);
+        return;
+    }
+
+    try {
+        // Check if hired tool exists
+        $stmt = $conn->prepare("SELECT * FROM hired_tools WHERE id = ?");
+        $stmt->execute([$hired_tool_id]);
+        $hired_tool = $stmt->fetch();
+        
+        if (!$hired_tool) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Hired tool not found']);
+            return;
+        }
+
+        // Delete hired tool record
+        $stmt = $conn->prepare("DELETE FROM hired_tools WHERE id = ?");
+        $stmt->execute([$hired_tool_id]);
+
+        if ($stmt->rowCount() > 0) {
+            echo json_encode([
+                'success' => true,
+                'message' => 'Hired tool deleted successfully'
+            ]);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Failed to delete hired tool']);
         }
 
     } catch (Exception $e) {

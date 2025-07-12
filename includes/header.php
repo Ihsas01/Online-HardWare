@@ -68,7 +68,7 @@ require_once 'php/config.php';
                                 <li><a class="dropdown-item" href="orders.php">Orders</a></li>
                                 <?php if (isAdmin()): ?>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="admin/">Admin Panel</a></li>
+                                    <li><a class="dropdown-item" href="admin/dashboard.php">Admin Dashboard</a></li>
                                 <?php endif; ?>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="logout.php">Logout</a></li>

@@ -86,6 +86,9 @@ include '../includes/header.php';
                 <a href="../products.php" class="btn btn-outline-primary">
                     <i class="fas fa-box me-2"></i>Manage Products
                 </a>
+                <a href="manage-users.php" class="btn btn-outline-info">
+                    <i class="fas fa-users me-2"></i>Manage Users
+                </a>
                 <a href="../hired-tools.php" class="btn btn-outline-secondary">
                     <i class="fas fa-eye me-2"></i>View Hireable Tools
                 </a>
@@ -225,13 +228,25 @@ include '../includes/header.php';
                                 </a>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <a href="../orders.php" class="btn btn-outline-info w-100">
-                                    <i class="fas fa-shopping-cart me-2"></i>View Orders
+                                <a href="manage-users.php" class="btn btn-outline-info w-100">
+                                    <i class="fas fa-users me-2"></i>Manage Users
                                 </a>
                             </div>
                             <div class="col-md-3 mb-3">
-                                <a href="../contact.php" class="btn btn-outline-warning w-100">
+                                <a href="../orders.php" class="btn btn-outline-warning w-100">
+                                    <i class="fas fa-shopping-cart me-2"></i>View Orders
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <a href="../contact.php" class="btn btn-outline-secondary w-100">
                                     <i class="fas fa-envelope me-2"></i>Contact Messages
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <a href="../hired-tools.php" class="btn btn-outline-dark w-100">
+                                    <i class="fas fa-eye me-2"></i>View Hireable Tools
                                 </a>
                             </div>
                         </div>

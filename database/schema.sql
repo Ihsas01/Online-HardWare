@@ -50,11 +50,15 @@ CREATE TABLE IF NOT EXISTS hired_tools (
     hire_date DATE NOT NULL,
     return_date DATE NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
-    status ENUM('pending', 'active', 'returned', 'cancelled') DEFAULT 'pending',
+    status ENUM('pending', 'approved', 'rejected', 'active', 'returned', 'cancelled') DEFAULT 'pending',
+    admin_notes TEXT,
+    admin_approved_by INT,
+    admin_approved_at TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (product_id) REFERENCES products(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (admin_approved_by) REFERENCES users(id)
 );
 
 -- Create orders table

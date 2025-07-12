@@ -103,6 +103,7 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 echo '<a href="product.php?id=' . $product['id'] . '" class="btn btn-primary btn-sm">View Details</a>';
                 if (isLoggedIn()) {
                     echo '<button class="btn btn-outline-primary btn-sm add-to-cart-btn" onclick="addToCart(' . $product['id'] . ')"><i class="fas fa-shopping-cart"></i></button>';
+                    echo '<button class="btn btn-success btn-sm hire-tool-btn" onclick="hireTool(' . $product['id'] . ', \'' . addslashes($product['name']) . '\', ' . $product['price'] . ')"><i class="fas fa-calendar-alt"></i> Hire</button>';
                 }
                 echo '</div>';
                 echo '</div>';
@@ -442,6 +443,10 @@ include 'includes/header.php';
                                                                 onclick="addToCart(<?php echo $product['id']; ?>)">
                                                             <i class="fas fa-shopping-cart"></i>
                                                         </button>
+                                                        <button class="btn btn-success btn-sm hire-tool-btn" 
+                                                                onclick="hireTool(<?php echo $product['id']; ?>, '<?php echo htmlspecialchars($product['name']); ?>', <?php echo $product['price']; ?>)">
+                                                            <i class="fas fa-calendar-alt"></i> Hire
+                                                        </button>
                                                     <?php endif; ?>
                                                 </div>
                                             </div>
@@ -736,6 +741,153 @@ include 'includes/header.php';
     document.querySelectorAll('.product-card, .filter-card').forEach(el => {
         observer.observe(el);
     });
+
+    // Hire tool functionality
+    function hireTool(productId, productName, price) {
+        // Set modal values
+        document.getElementById('hireProductName').textContent = productName;
+        document.getElementById('hireProductPrice').textContent = '$' + price.toFixed(2);
+        document.getElementById('productId').value = productId;
+        document.getElementById('dailyPrice').value = price;
+        
+        // Set default dates
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        
+        document.getElementById('hireDate').value = today.toISOString().split('T')[0];
+        document.getElementById('returnDate').value = tomorrow.toISOString().split('T')[0];
+        
+        // Calculate initial total
+        calculateHireTotal();
+        
+        // Show modal
+        new bootstrap.Modal(document.getElementById('hireToolModal')).show();
+    }
+
+    function calculateHireTotal() {
+        const hireDate = new Date(document.getElementById('hireDate').value);
+        const returnDate = new Date(document.getElementById('returnDate').value);
+        const dailyPrice = parseFloat(document.getElementById('dailyPrice').value);
+        
+        if (hireDate && returnDate && dailyPrice) {
+            const days = Math.ceil((returnDate - hireDate) / (1000 * 60 * 60 * 24));
+            const total = days * dailyPrice;
+            document.getElementById('totalPrice').textContent = '$' + total.toFixed(2);
+            document.getElementById('totalDays').textContent = days + ' day' + (days !== 1 ? 's' : '');
+        }
+    }
+
+    function submitHireRequest() {
+        const formData = new FormData(document.getElementById('hireForm'));
+        formData.append('action', 'book_tool');
+        
+        // Show loading state
+        const submitBtn = document.getElementById('submitHireBtn');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+        submitBtn.disabled = true;
+        
+        fetch('php/process_hired_tool.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                // Close modal
+                bootstrap.Modal.getInstance(document.getElementById('hireToolModal')).hide();
+                // Optionally redirect to hired tools page
+                window.location.href = 'hired-tools.php';
+            } else {
+                alert('Error: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        })
+        .finally(() => {
+            // Reset button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        });
+    }
 </script>
+
+<!-- Hire Tool Modal -->
+<div class="modal fade" id="hireToolModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    <i class="fas fa-calendar-alt me-2"></i>Hire Tool
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="hireForm">
+                    <input type="hidden" id="productId" name="product_id">
+                    <input type="hidden" id="dailyPrice" name="daily_price">
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Tool Information</h6>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h6 id="hireProductName" class="card-title"></h6>
+                                    <p class="card-text">
+                                        <strong>Daily Rate:</strong> <span id="hireProductPrice"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Hire Details</h6>
+                            <div class="mb-3">
+                                <label for="hireDate" class="form-label">Hire Date</label>
+                                <input type="date" class="form-control" id="hireDate" name="hire_date" 
+                                       onchange="calculateHireTotal()" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="returnDate" class="form-label">Return Date</label>
+                                <input type="date" class="form-control" id="returnDate" name="return_date" 
+                                       onchange="calculateHireTotal()" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Duration:</strong> <span id="totalDays">1 day</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Total Price:</strong> <span id="totalPrice">$0.00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Important:</strong> Your hire request will be reviewed by our admin team. 
+                        You will be notified once your request is approved or rejected.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="submitHireBtn" onclick="submitHireRequest()">
+                    <i class="fas fa-calendar-check me-2"></i>Submit Hire Request
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <?php include 'includes/footer.php'; ?> 

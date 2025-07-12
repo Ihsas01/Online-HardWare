@@ -84,7 +84,10 @@ include '../includes/header.php';
                     <i class="fas fa-tools me-2"></i>Manage Hired Tools
                 </a>
                 <a href="../products.php" class="btn btn-outline-primary">
-                    <i class="fas fa-box me-2"></i>View Products
+                    <i class="fas fa-box me-2"></i>Manage Products
+                </a>
+                <a href="../hired-tools.php" class="btn btn-outline-secondary">
+                    <i class="fas fa-eye me-2"></i>View Hireable Tools
                 </a>
             </div>
         </div>

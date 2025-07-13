@@ -70,82 +70,127 @@ try {
 include 'includes/header.php';
 ?>
 
-<!-- Admin Hired Tools Management Section -->
-<section class="py-5">
+<!-- Hired Tools Hero Section -->
+<section class="hired-hero">
     <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1>Manage Hired Tools</h1>
-            <div>
-                <button class="btn btn-success me-2" onclick="showAddModal()">
-                    <i class="fas fa-plus"></i> Add New Hired Tool
+        <div class="hired-hero-content">
+            <h1 class="hired-hero-title">
+                <i class="fas fa-tools me-3"></i>
+                Manage Hired Tools
+            </h1>
+            <p class="hired-hero-subtitle">
+                Manage tool rentals, approvals, and customer requests with ease.
+            </p>
+            <div class="hired-hero-actions">
+                <button class="hired-btn hired-btn-success hired-interactive" onclick="showAddModal()">
+                    <i class="fas fa-plus"></i>
+                    Add New Hired Tool
                 </button>
-                <a href="hired-tools.php" class="btn btn-secondary">View All Hired Tools</a>
+                <a href="hired-tools.php" class="hired-btn hired-btn-secondary hired-interactive">
+                    <i class="fas fa-eye"></i>
+                    View All Hired Tools
+                </a>
             </div>
         </div>
-        
+    </div>
+</section>
+
+<!-- Hired Tools Management Content -->
+<section class="hired-management">
+    <div class="hired-container">
         <?php if (isset($error)): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
+            <div class="alert alert-danger hired-interactive">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <?php echo $error; ?>
+            </div>
         <?php endif; ?>
         
         <!-- Statistics Cards -->
-        <div class="row mb-4">
-            <div class="col-md-2">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo $stats['total'] ?? 0; ?></h5>
-                        <p class="card-text text-muted">Total</p>
+        <div class="hired-stats-grid">
+            <div class="hired-stat-card total hired-interactive">
+                <div class="hired-stat-content">
+                    <div class="hired-stat-info">
+                        <h3><?php echo number_format($stats['total'] ?? 0); ?></h3>
+                        <p>Total Tools</p>
+                    </div>
+                    <div class="hired-stat-icon">
+                        <i class="fas fa-tools"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
-                <div class="card text-center bg-warning text-white">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo $stats['pending'] ?? 0; ?></h5>
-                        <p class="card-text">Pending</p>
+            
+            <div class="hired-stat-card pending hired-interactive">
+                <div class="hired-stat-content">
+                    <div class="hired-stat-info">
+                        <h3><?php echo number_format($stats['pending'] ?? 0); ?></h3>
+                        <p>Pending</p>
+                    </div>
+                    <div class="hired-stat-icon">
+                        <i class="fas fa-clock"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
-                <div class="card text-center bg-info text-white">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo $stats['approved'] ?? 0; ?></h5>
-                        <p class="card-text">Approved</p>
+            
+            <div class="hired-stat-card approved hired-interactive">
+                <div class="hired-stat-content">
+                    <div class="hired-stat-info">
+                        <h3><?php echo number_format($stats['approved'] ?? 0); ?></h3>
+                        <p>Approved</p>
+                    </div>
+                    <div class="hired-stat-icon">
+                        <i class="fas fa-check-circle"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
-                <div class="card text-center bg-danger text-white">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo $stats['rejected'] ?? 0; ?></h5>
-                        <p class="card-text">Rejected</p>
+            
+            <div class="hired-stat-card rejected hired-interactive">
+                <div class="hired-stat-content">
+                    <div class="hired-stat-info">
+                        <h3><?php echo number_format($stats['rejected'] ?? 0); ?></h3>
+                        <p>Rejected</p>
+                    </div>
+                    <div class="hired-stat-icon">
+                        <i class="fas fa-times-circle"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
-                <div class="card text-center bg-success text-white">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo $stats['active'] ?? 0; ?></h5>
-                        <p class="card-text">Active</p>
+            
+            <div class="hired-stat-card active hired-interactive">
+                <div class="hired-stat-content">
+                    <div class="hired-stat-info">
+                        <h3><?php echo number_format($stats['active'] ?? 0); ?></h3>
+                        <p>Active</p>
+                    </div>
+                    <div class="hired-stat-icon">
+                        <i class="fas fa-play-circle"></i>
                     </div>
                 </div>
             </div>
-            <div class="col-md-2">
-                <div class="card text-center bg-secondary text-white">
-                    <div class="card-body">
-                        <h5 class="card-title"><?php echo $stats['returned'] ?? 0; ?></h5>
-                        <p class="card-text">Returned</p>
+            
+            <div class="hired-stat-card returned hired-interactive">
+                <div class="hired-stat-content">
+                    <div class="hired-stat-info">
+                        <h3><?php echo number_format($stats['returned'] ?? 0); ?></h3>
+                        <p>Returned</p>
+                    </div>
+                    <div class="hired-stat-icon">
+                        <i class="fas fa-undo"></i>
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Filters -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <form method="GET" class="row g-3">
-                    <div class="col-md-4">
-                        <label for="status" class="form-label">Status Filter</label>
-                        <select class="form-select" id="status" name="status">
+        <!-- Filters Section -->
+        <div class="hired-filters-card">
+            <div class="hired-filters-header">
+                <i class="fas fa-filter"></i>
+                <h5>Search & Filter Tools</h5>
+            </div>
+            <div class="hired-filters-body">
+                <form method="GET" class="hired-filters-form">
+                    <div class="hired-form-group">
+                        <label for="status" class="hired-form-label">Status Filter</label>
+                        <select class="hired-form-control" id="status" name="status">
                             <option value="">All Status</option>
                             <option value="pending" <?php echo $status_filter === 'pending' ? 'selected' : ''; ?>>Pending</option>
                             <option value="approved" <?php echo $status_filter === 'approved' ? 'selected' : ''; ?>>Approved</option>
@@ -154,137 +199,163 @@ include 'includes/header.php';
                             <option value="returned" <?php echo $status_filter === 'returned' ? 'selected' : ''; ?>>Returned</option>
                         </select>
                     </div>
-                    <div class="col-md-4">
-                        <label for="date_filter" class="form-label">Date Filter</label>
-                        <select class="form-select" id="date_filter" name="date_filter">
+                    
+                    <div class="hired-form-group">
+                        <label for="date_filter" class="hired-form-label">Date Filter</label>
+                        <select class="hired-form-control" id="date_filter" name="date_filter">
                             <option value="">All Time</option>
                             <option value="today" <?php echo $date_filter === 'today' ? 'selected' : ''; ?>>Today</option>
                             <option value="week" <?php echo $date_filter === 'week' ? 'selected' : ''; ?>>This Week</option>
                             <option value="month" <?php echo $date_filter === 'month' ? 'selected' : ''; ?>>This Month</option>
                         </select>
                     </div>
-                    <div class="col-md-4 d-flex align-items-end">
-                        <button type="submit" class="btn btn-primary me-2">Filter</button>
-                        <a href="admin-hired-tools.php" class="btn btn-secondary">Clear</a>
+                    
+                    <div class="hired-form-group">
+                        <button type="submit" class="hired-btn hired-btn-primary">
+                            <i class="fas fa-search"></i>
+                            Filter
+                        </button>
+                        <a href="admin-hired-tools.php" class="hired-btn hired-btn-secondary">
+                            <i class="fas fa-times"></i>
+                            Clear
+                        </a>
                     </div>
                 </form>
             </div>
         </div>
         
-        <?php if (empty($hiredTools)): ?>
-            <div class="text-center py-5">
-                <i class="fas fa-tools fa-3x text-muted mb-3"></i>
-                <h3>No Hired Tools Found</h3>
-                <p class="text-muted">No tools match the current filters</p>
+        <!-- Hired Tools Table -->
+        <div class="hired-table-card">
+            <div class="hired-table-header">
+                <div>
+                    <i class="fas fa-table me-2"></i>
+                    <h5>Hired Tools Management</h5>
+                </div>
+                <div>
+                    <span class="badge bg-light text-dark"><?php echo count($hiredTools); ?> tools</span>
+                </div>
             </div>
-        <?php else: ?>
-            <div class="table-responsive">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Tool</th>
-                            <th>Customer</th>
-                            <th>Hire Period</th>
-                            <th>Total Price</th>
-                            <th>Status</th>
-                            <th>Created</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($hiredTools as $tool): ?>
-                            <tr>
-                                <td>#<?php echo $tool['id']; ?></td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <?php if (!empty($tool['image'])): ?>
-                                            <img src="<?php echo htmlspecialchars($tool['image']); ?>" 
-                                                 class="me-2" style="width: 40px; height: 40px; object-fit: cover;">
-                                        <?php endif; ?>
-                                        <span><?php echo htmlspecialchars($tool['product_name']); ?></span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div>
-                                        <strong><?php echo htmlspecialchars($tool['first_name'] . ' ' . $tool['last_name']); ?></strong><br>
-                                        <small class="text-muted"><?php echo htmlspecialchars($tool['email']); ?></small>
-                                    </div>
-                                </td>
-                                <td>
-                                    <div>
-                                        <small><strong>From:</strong> <?php echo date('M d, Y', strtotime($tool['hire_date'])); ?></small><br>
-                                        <small><strong>To:</strong> <?php echo date('M d, Y', strtotime($tool['return_date'])); ?></small>
-                                    </div>
-                                </td>
-                                <td>$<?php echo number_format($tool['total_price'], 2); ?></td>
-                                <td>
-                                    <span class="badge bg-<?php 
-                                        echo match($tool['status']) {
-                                            'pending' => 'warning',
-                                            'approved' => 'info',
-                                            'rejected' => 'danger',
-                                            'active' => 'success',
-                                            'returned' => 'secondary',
-                                            'cancelled' => 'dark',
-                                            default => 'secondary'
-                                        };
-                                    ?>">
-                                        <?php echo ucfirst($tool['status']); ?>
-                                    </span>
-                                </td>
-                                <td><?php echo date('M d, Y H:i', strtotime($tool['created_at'])); ?></td>
-                                <td>
-                                    <div class="btn-group btn-group-sm" role="group">
-                                        <?php if ($tool['status'] === 'pending'): ?>
-                                            <button class="btn btn-success" 
-                                                    onclick="approveTool(<?php echo $tool['id']; ?>)"
-                                                    title="Approve">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button class="btn btn-danger" 
-                                                    onclick="rejectTool(<?php echo $tool['id']; ?>)"
-                                                    title="Reject">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        <?php elseif ($tool['status'] === 'approved'): ?>
-                                            <button class="btn btn-success btn-sm" 
-                                                    onclick="activateTool(<?php echo $tool['id']; ?>)"
-                                                    title="Activate">
-                                                <i class="fas fa-play"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                        
-                                        <button class="btn btn-warning btn-sm" 
-                                                onclick="editTool(<?php echo $tool['id']; ?>)"
-                                                title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        
-                                        <button class="btn btn-danger btn-sm" 
-                                                onclick="deleteTool(<?php echo $tool['id']; ?>)"
-                                                title="Delete">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        
-                                        <button class="btn btn-info btn-sm" 
-                                                onclick="viewDetails(<?php echo $tool['id']; ?>)"
-                                                title="View Details">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <div class="hired-table-body">
+                <?php if (empty($hiredTools)): ?>
+                    <div class="hired-empty-state">
+                        <div class="hired-empty-icon">
+                            <i class="fas fa-tools"></i>
+                        </div>
+                        <h3 class="hired-empty-title">No Hired Tools Found</h3>
+                        <p class="hired-empty-text">No tools match the current filters</p>
+                        <button class="hired-btn hired-btn-success hired-interactive" onclick="showAddModal()">
+                            <i class="fas fa-plus"></i>
+                            Add First Tool
+                        </button>
+                    </div>
+                <?php else: ?>
+                    <div class="table-responsive">
+                        <table class="hired-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Tool</th>
+                                    <th>Customer</th>
+                                    <th>Hire Period</th>
+                                    <th>Total Price</th>
+                                    <th>Status</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($hiredTools as $tool): ?>
+                                    <tr class="hired-interactive">
+                                        <td><strong>#<?php echo $tool['id']; ?></strong></td>
+                                        <td>
+                                            <div class="hired-tool-info">
+                                                <?php if (!empty($tool['image'])): ?>
+                                                    <img src="<?php echo htmlspecialchars($tool['image']); ?>" 
+                                                         class="hired-tool-image" alt="Tool Image">
+                                                <?php endif; ?>
+                                                <span class="hired-tool-name"><?php echo htmlspecialchars($tool['product_name']); ?></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="hired-customer-info">
+                                                <div class="hired-customer-name">
+                                                    <?php echo htmlspecialchars($tool['first_name'] . ' ' . $tool['last_name']); ?>
+                                                </div>
+                                                <div class="hired-customer-email">
+                                                    <?php echo htmlspecialchars($tool['email']); ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="hired-hire-period">
+                                                <div class="hired-hire-date">
+                                                    <strong>From:</strong> <?php echo date('M d, Y', strtotime($tool['hire_date'])); ?>
+                                                </div>
+                                                <div class="hired-hire-date">
+                                                    <strong>To:</strong> <?php echo date('M d, Y', strtotime($tool['return_date'])); ?>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td><strong>$<?php echo number_format($tool['total_price'], 2); ?></strong></td>
+                                        <td>
+                                            <span class="hired-badge <?php echo $tool['status']; ?>">
+                                                <?php echo ucfirst($tool['status']); ?>
+                                            </span>
+                                        </td>
+                                        <td><?php echo date('M d, Y H:i', strtotime($tool['created_at'])); ?></td>
+                                        <td>
+                                            <div class="hired-actions">
+                                                <?php if ($tool['status'] === 'pending'): ?>
+                                                    <button class="hired-action-btn approve hired-interactive" 
+                                                            onclick="approveTool(<?php echo $tool['id']; ?>)"
+                                                            title="Approve">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                    <button class="hired-action-btn reject hired-interactive" 
+                                                            onclick="rejectTool(<?php echo $tool['id']; ?>)"
+                                                            title="Reject">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                <?php elseif ($tool['status'] === 'approved'): ?>
+                                                    <button class="hired-action-btn activate hired-interactive" 
+                                                            onclick="activateTool(<?php echo $tool['id']; ?>)"
+                                                            title="Activate">
+                                                        <i class="fas fa-play"></i>
+                                                    </button>
+                                                <?php endif; ?>
+                                                
+                                                <button class="hired-action-btn edit hired-interactive" 
+                                                        onclick="editTool(<?php echo $tool['id']; ?>)"
+                                                        title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                
+                                                <button class="hired-action-btn delete hired-interactive" 
+                                                        onclick="deleteTool(<?php echo $tool['id']; ?>)"
+                                                        title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                                
+                                                <button class="hired-action-btn view hired-interactive" 
+                                                        onclick="viewDetails(<?php echo $tool['id']; ?>)"
+                                                        title="View Details">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
             </div>
-        <?php endif; ?>
+        </div>
     </div>
 </section>
 
 <!-- Admin Approval Modal -->
-<div class="modal fade" id="approvalModal" tabindex="-1">
+<div class="modal fade hired-modal" id="approvalModal" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -297,20 +368,20 @@ include 'includes/header.php';
                     <input type="hidden" id="approvalAction" name="action">
                     <div class="mb-3">
                         <label for="adminNotes" class="form-label">Admin Notes (Optional)</label>
-                        <textarea class="form-control" id="adminNotes" name="admin_notes" rows="3"></textarea>
+                        <textarea class="form-control" id="adminNotes" name="admin_notes" rows="3" placeholder="Add any notes about this approval..."></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="submitApproval()">Submit</button>
+                <button type="button" class="hired-btn hired-btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="hired-btn hired-btn-primary hired-interactive" onclick="submitApproval()">Submit</button>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Tool Details Modal -->
-<div class="modal fade" id="detailsModal" tabindex="-1">
+<div class="modal fade hired-modal" id="detailsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -325,7 +396,7 @@ include 'includes/header.php';
 </div>
 
 <!-- Add/Edit Hired Tool Modal -->
-<div class="modal fade" id="hiredToolModal" tabindex="-1">
+<div class="modal fade hired-modal" id="hiredToolModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -435,14 +506,97 @@ include 'includes/header.php';
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" onclick="submitHiredToolForm()">Save</button>
+                <button type="button" class="hired-btn hired-btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="hired-btn hired-btn-primary hired-interactive" onclick="submitHiredToolForm()">Save</button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Add the admin hired tools CSS -->
+<link rel="stylesheet" href="css/admin-hired-tools.css">
+
+<!-- JavaScript for enhanced hired tools interactions -->
 <script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add loading animation class
+    const management = document.querySelector('.hired-management');
+    if (management) {
+        management.classList.add('hired-loading');
+        setTimeout(() => {
+            management.classList.add('loaded');
+        }, 100);
+    }
+    
+    // Add hover effects for interactive elements
+    const interactiveElements = document.querySelectorAll('.hired-interactive');
+    interactiveElements.forEach(element => {
+        element.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.02)';
+        });
+        
+        element.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+    
+    // Enhanced stat card animations
+    const statCards = document.querySelectorAll('.hired-stat-card');
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            const icon = this.querySelector('.hired-stat-icon');
+            if (icon) {
+                icon.style.transform = 'scale(1.1) rotate(5deg)';
+            }
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            const icon = this.querySelector('.hired-stat-icon');
+            if (icon) {
+                icon.style.transform = 'scale(1) rotate(0deg)';
+            }
+        });
+    });
+    
+    // Table row hover effects
+    const tableRows = document.querySelectorAll('.hired-table tr');
+    tableRows.forEach(row => {
+        row.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = 'var(--hired-bg-light)';
+        });
+        
+        row.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '';
+        });
+    });
+    
+    // Action button hover effects
+    const actionButtons = document.querySelectorAll('.hired-action-btn');
+    actionButtons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.15)';
+        });
+        
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+    
+    // Form control focus effects
+    const formControls = document.querySelectorAll('.hired-form-control');
+    formControls.forEach(control => {
+        control.addEventListener('focus', function() {
+            this.style.borderColor = 'var(--hired-primary)';
+            this.style.boxShadow = '0 0 0 3px rgba(245, 158, 11, 0.1)';
+        });
+        
+        control.addEventListener('blur', function() {
+            this.style.borderColor = 'var(--hired-border)';
+            this.style.boxShadow = 'none';
+        });
+    });
+});
+
 function approveTool(toolId) {
     document.getElementById('hiredToolId').value = toolId;
     document.getElementById('approvalAction').value = 'approve_tool';
@@ -470,15 +624,17 @@ function activateTool(toolId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);
-                location.reload();
+                showNotification(data.message, 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
             } else {
-                alert('Error: ' + data.error);
+                showNotification('Error: ' + data.error, 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            showNotification('An error occurred. Please try again.', 'error');
         });
     }
 }
@@ -493,15 +649,17 @@ function submitApproval() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            location.reload();
+            showNotification(data.message, 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
         } else {
-            alert('Error: ' + data.error);
+            showNotification('Error: ' + data.error, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+        showNotification('An error occurred. Please try again.', 'error');
     });
 }
 
@@ -515,11 +673,10 @@ function viewDetails(toolId) {
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error loading tool details');
+            showNotification('Error loading tool details', 'error');
         });
 }
 
-// New functions for add, edit, and delete
 function showAddModal() {
     document.getElementById('hiredToolModalTitle').textContent = 'Add New Hired Tool';
     document.getElementById('formAction').value = 'add_hired_tool';
@@ -554,12 +711,12 @@ function editTool(toolId) {
                 
                 new bootstrap.Modal(document.getElementById('hiredToolModal')).show();
             } else {
-                alert('Error: ' + data.error);
+                showNotification('Error: ' + data.error, 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Error loading tool data');
+            showNotification('Error loading tool data', 'error');
         });
 }
 
@@ -576,15 +733,17 @@ function deleteTool(toolId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);
-                location.reload();
+                showNotification(data.message, 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
             } else {
-                alert('Error: ' + data.error);
+                showNotification('Error: ' + data.error, 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            showNotification('An error occurred. Please try again.', 'error');
         });
     }
 }
@@ -598,7 +757,7 @@ function submitHiredToolForm() {
     const returnDate = new Date(formData.get('return_date'));
     
     if (returnDate <= hireDate) {
-        alert('Return date must be after hire date');
+        showNotification('Return date must be after hire date', 'error');
         return;
     }
     
@@ -609,16 +768,43 @@ function submitHiredToolForm() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
-            location.reload();
+            showNotification(data.message, 'success');
+            setTimeout(() => {
+                location.reload();
+            }, 1500);
         } else {
-            alert('Error: ' + data.error);
+            showNotification('Error: ' + data.error, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred. Please try again.');
+        showNotification('An error occurred. Please try again.', 'error');
     });
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+    notification.style.cssText = `
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        animation: slideInFromRight 0.3s ease;
+    `;
+    notification.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+        ${message}
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOutToRight 0.3s ease';
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
 }
 
 // Auto-calculate total price when dates or product changes
@@ -645,6 +831,33 @@ document.addEventListener('DOMContentLoaded', function() {
     hireDateInput.addEventListener('change', calculatePrice);
     returnDateInput.addEventListener('change', calculatePrice);
 });
+
+// Add notification animations
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideInFromRight {
+        from {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+        to {
+            transform: translateX(0);
+            opacity: 1;
+        }
+    }
+    
+    @keyframes slideOutToRight {
+        from {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        to {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+    }
+`;
+document.head.appendChild(style);
 </script>
 
 <?php include 'includes/footer.php'; ?> 

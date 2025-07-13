@@ -443,6 +443,10 @@ include 'includes/header.php';
                                                                 onclick="addToCart(<?php echo $product['id']; ?>)">
                                                             <i class="fas fa-shopping-cart"></i>
                                                         </button>
+                                                        <button class="btn btn-outline-danger btn-sm add-to-wishlist-btn" 
+                                                                onclick="addToWishlist(<?php echo $product['id']; ?>)">
+                                                            <i class="fas fa-heart"></i>
+                                                        </button>
                                                         <button class="btn btn-success btn-sm hire-tool-btn" 
                                                                 onclick="hireTool(<?php echo $product['id']; ?>, '<?php echo htmlspecialchars($product['name']); ?>', <?php echo $product['price']; ?>)">
                                                             <i class="fas fa-calendar-alt"></i> Hire
@@ -741,6 +745,108 @@ include 'includes/header.php';
     document.querySelectorAll('.product-card, .filter-card').forEach(el => {
         observer.observe(el);
     });
+
+    // Add to cart functionality
+    function addToCart(productId) {
+        const formData = new FormData();
+        formData.append('action', 'add_to_cart');
+        formData.append('product_id', productId);
+        formData.append('quantity', 1);
+        
+        fetch('php/process_cart.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Product added to cart successfully!', 'success');
+            } else {
+                showNotification('Error: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred. Please try again.', 'error');
+        });
+    }
+
+    // Add to wishlist functionality
+    function addToWishlist(productId) {
+        const formData = new FormData();
+        formData.append('action', 'add_to_wishlist');
+        formData.append('product_id', productId);
+        
+        fetch('php/process_wishlist.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Product added to wishlist!', 'success');
+            } else {
+                showNotification('Error: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred. Please try again.', 'error');
+        });
+    }
+
+    // Show notification function
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+        notification.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            animation: slideInFromRight 0.3s ease;
+        `;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutToRight 0.3s ease';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Add notification animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInFromRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutToRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
 
     // Hire tool functionality
     function hireTool(productId, productName, price) {

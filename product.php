@@ -139,12 +139,24 @@ try {
                             </ul>
                         </div>
                         <div class="d-grid gap-2">
-                            <button class="btn btn-primary btn-lg">
-                                <i class="fas fa-shopping-cart"></i> Add to Cart
-                            </button>
-                            <button class="btn btn-outline-primary">
-                                <i class="fas fa-heart"></i> Add to Wishlist
-                            </button>
+                            <?php if (isLoggedIn()): ?>
+                                <button class="btn btn-primary btn-lg" onclick="addToCart(<?php echo $product['id']; ?>)">
+                                    <i class="fas fa-shopping-cart"></i> Add to Cart
+                                </button>
+                                <button class="btn btn-outline-danger" onclick="addToWishlist(<?php echo $product['id']; ?>)">
+                                    <i class="fas fa-heart"></i> Add to Wishlist
+                                </button>
+                                <button class="btn btn-success" onclick="hireTool(<?php echo $product['id']; ?>, '<?php echo htmlspecialchars($product['name']); ?>', <?php echo $product['price']; ?>)">
+                                    <i class="fas fa-calendar-alt"></i> Hire This Tool
+                                </button>
+                            <?php else: ?>
+                                <a href="login.php" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-sign-in-alt"></i> Login to Purchase
+                                </a>
+                                <a href="login.php" class="btn btn-outline-primary">
+                                    <i class="fas fa-heart"></i> Login to Add to Wishlist
+                                </a>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -221,5 +233,116 @@ try {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/main.js"></script>
+    
+    <!-- Product Page JavaScript -->
+    <script>
+    // Add to cart functionality
+    function addToCart(productId) {
+        const formData = new FormData();
+        formData.append('action', 'add_to_cart');
+        formData.append('product_id', productId);
+        formData.append('quantity', 1);
+        
+        fetch('php/process_cart.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Product added to cart successfully!', 'success');
+            } else {
+                showNotification('Error: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred. Please try again.', 'error');
+        });
+    }
+
+    // Add to wishlist functionality
+    function addToWishlist(productId) {
+        const formData = new FormData();
+        formData.append('action', 'add_to_wishlist');
+        formData.append('product_id', productId);
+        
+        fetch('php/process_wishlist.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('Product added to wishlist!', 'success');
+            } else {
+                showNotification('Error: ' + data.error, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('An error occurred. Please try again.', 'error');
+        });
+    }
+
+    // Hire tool functionality
+    function hireTool(productId, productName, price) {
+        // Redirect to hired tools page with product info
+        window.location.href = `hired-tools.php?product_id=${productId}&product_name=${encodeURIComponent(productName)}&price=${price}`;
+    }
+
+    // Show notification function
+    function showNotification(message, type) {
+        const notification = document.createElement('div');
+        notification.className = `alert alert-${type === 'success' ? 'success' : 'danger'} position-fixed`;
+        notification.style.cssText = `
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            min-width: 300px;
+            animation: slideInFromRight 0.3s ease;
+        `;
+        notification.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(notification);
+        
+        setTimeout(() => {
+            notification.style.animation = 'slideOutToRight 0.3s ease';
+            setTimeout(() => {
+                notification.remove();
+            }, 300);
+        }, 3000);
+    }
+
+    // Add notification animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideInFromRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutToRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    </script>
 </body>
 </html> 

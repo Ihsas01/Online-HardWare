@@ -67,7 +67,7 @@ include '../includes/header.php';
                 Manage your user accounts, roles, and permissions with ease.
             </p>
             <div class="users-hero-actions">
-                <button class="users-btn users-btn-success users-interactive" onclick="showAddUserModal()">
+                <button class="users-btn users-btn-success users-interactive" onclick="console.log('Button clicked via onclick'); showAddUserModal();" id="addUserBtn">
                     <i class="fas fa-plus"></i>
                     Add New User
                 </button>
@@ -347,6 +347,8 @@ include '../includes/header.php';
 <!-- JavaScript for enhanced user management interactions -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing user management...');
+    
     // Add loading animation class
     const management = document.querySelector('.users-management');
     if (management) {
@@ -354,6 +356,17 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             management.classList.add('loaded');
         }, 100);
+    }
+    
+    // Add event listener to Add User button as backup
+    const addUserBtn = document.getElementById('addUserBtn');
+    if (addUserBtn) {
+        addUserBtn.addEventListener('click', function(e) {
+            console.log('Add User button clicked via event listener');
+            showAddUserModal();
+        });
+    } else {
+        console.error('Add User button not found');
     }
     
     // Add hover effects for interactive elements
@@ -426,14 +439,62 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function showAddUserModal() {
+    console.log('showAddUserModal called');
+    
+    // Check if Bootstrap is available
+    if (typeof bootstrap === 'undefined') {
+        console.error('Bootstrap is not loaded');
+        alert('Bootstrap is not loaded. Please refresh the page.');
+        return;
+    }
+    
+    // Check if modal element exists
+    const modalElement = document.getElementById('userModal');
+    if (!modalElement) {
+        console.error('Modal element not found');
+        alert('Modal element not found. Please refresh the page.');
+        return;
+    }
+    
+    // Reset form
+    document.getElementById('userForm').reset();
+    
+    // Set modal title and action
     document.getElementById('userModalTitle').textContent = 'Add New User';
     document.getElementById('formAction').value = 'add_user';
     document.getElementById('userId').value = '';
-    document.getElementById('userForm').reset();
+    
+    // Make password fields required for new users
     document.getElementById('password').required = true;
     document.getElementById('confirmPassword').required = true;
     
-    new bootstrap.Modal(document.getElementById('userModal')).show();
+    // Clear any previous error states
+    const formControls = document.querySelectorAll('#userForm .form-control');
+    formControls.forEach(control => {
+        control.classList.remove('is-invalid');
+    });
+    
+    // Show the modal
+    try {
+        const modal = new bootstrap.Modal(modalElement);
+        modal.show();
+        console.log('Modal should be visible now');
+    } catch (error) {
+        console.error('Error showing modal:', error);
+        // Fallback: try to show modal manually
+        try {
+            modalElement.style.display = 'block';
+            modalElement.classList.add('show');
+            document.body.classList.add('modal-open');
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modal-backdrop fade show';
+            document.body.appendChild(backdrop);
+            console.log('Modal shown with fallback method');
+        } catch (fallbackError) {
+            console.error('Fallback also failed:', fallbackError);
+            alert('Error showing modal: ' + error.message);
+        }
+    }
 }
 
 function editUser(userId) {
@@ -502,20 +563,63 @@ function submitUserForm() {
     const form = document.getElementById('userForm');
     const formData = new FormData(form);
     
-    // Validate password match
-    const password = formData.get('password');
-    const confirmPassword = formData.get('confirm_password');
+    // Clear previous error states
+    const formControls = document.querySelectorAll('#userForm .form-control');
+    formControls.forEach(control => {
+        control.classList.remove('is-invalid');
+    });
     
-    if (password && password !== confirmPassword) {
-        showNotification('Passwords do not match', 'error');
+    // Validate required fields
+    const requiredFields = ['username', 'email', 'first_name', 'last_name', 'role'];
+    let hasErrors = false;
+    
+    requiredFields.forEach(fieldName => {
+        const field = form.querySelector(`[name="${fieldName}"]`);
+        if (!field.value.trim()) {
+            field.classList.add('is-invalid');
+            hasErrors = true;
+        }
+    });
+    
+    // Validate password for new users
+    if (formData.get('action') === 'add_user') {
+        const password = formData.get('password');
+        const confirmPassword = formData.get('confirm_password');
+        
+        if (!password) {
+            document.getElementById('password').classList.add('is-invalid');
+            hasErrors = true;
+        }
+        
+        if (!confirmPassword) {
+            document.getElementById('confirmPassword').classList.add('is-invalid');
+            hasErrors = true;
+        }
+        
+        if (password && confirmPassword && password !== confirmPassword) {
+            document.getElementById('password').classList.add('is-invalid');
+            document.getElementById('confirmPassword').classList.add('is-invalid');
+            showNotification('Passwords do not match', 'error');
+            return;
+        }
+    }
+    
+    if (hasErrors) {
+        showNotification('Please fill in all required fields', 'error');
         return;
     }
     
     // If editing and no password provided, remove password fields
-    if (formData.get('action') === 'edit_user' && !password) {
+    if (formData.get('action') === 'edit_user' && !formData.get('password')) {
         formData.delete('password');
         formData.delete('confirm_password');
     }
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#userModal .modal-footer .users-btn-primary');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+    submitBtn.disabled = true;
     
     fetch('../php/process_user.php', {
         method: 'POST',
@@ -525,16 +629,26 @@ function submitUserForm() {
     .then(data => {
         if (data.success) {
             showNotification(data.message, 'success');
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+            modal.hide();
+            // Reload page after a short delay
             setTimeout(() => {
                 location.reload();
             }, 1500);
         } else {
             showNotification('Error: ' + data.error, 'error');
+            // Reset button
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
         }
     })
     .catch(error => {
         console.error('Error:', error);
         showNotification('An error occurred. Please try again.', 'error');
+        // Reset button
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
     });
 }
 

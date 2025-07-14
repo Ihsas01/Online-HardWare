@@ -84,12 +84,6 @@ function handleSearch(event) {
     }
 }
 
-// Function to add items to cart (placeholder)
-function addToCart(productId) {
-    // In a real application, this would update a shopping cart
-    alert(`Product ${productId} added to cart!`);
-}
-
 // Initialize the page
 document.addEventListener('DOMContentLoaded', () => {
     // Load featured products

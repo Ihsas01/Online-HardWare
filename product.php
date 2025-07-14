@@ -98,8 +98,8 @@ try {
                 <div class="row">
                     <!-- Product Image -->
                     <div class="col-md-6 mb-4">
-                        <?php if ($product['image_url']): ?>
-                            <img src="<?php echo htmlspecialchars($product['image_url']); ?>" 
+                        <?php if (isset($product['image']) && $product['image']): ?>
+                            <img src="<?php echo htmlspecialchars($product['image']); ?>" 
                                  class="img-fluid rounded" 
                                  alt="<?php echo htmlspecialchars($product['name']); ?>">
                         <?php else: ?>
@@ -127,14 +127,17 @@ try {
                         <div class="mb-4">
                             <h5>Specifications</h5>
                             <ul class="list-unstyled">
-                                <?php if ($product['brand']): ?>
+                                <?php if (isset($product['brand']) && $product['brand']): ?>
                                     <li><strong>Brand:</strong> <?php echo htmlspecialchars($product['brand']); ?></li>
                                 <?php endif; ?>
-                                <?php if ($product['model']): ?>
+                                <?php if (isset($product['model']) && $product['model']): ?>
                                     <li><strong>Model:</strong> <?php echo htmlspecialchars($product['model']); ?></li>
                                 <?php endif; ?>
-                                <?php if ($product['sku']): ?>
+                                <?php if (isset($product['sku']) && $product['sku']): ?>
                                     <li><strong>SKU:</strong> <?php echo htmlspecialchars($product['sku']); ?></li>
+                                <?php endif; ?>
+                                <?php if (isset($product['stock'])): ?>
+                                    <li><strong>Stock:</strong> <?php echo htmlspecialchars($product['stock']); ?> units available</li>
                                 <?php endif; ?>
                             </ul>
                         </div>
@@ -169,8 +172,8 @@ try {
                             <?php foreach ($related_products as $related): ?>
                                 <div class="col">
                                     <div class="card h-100">
-                                        <?php if ($related['image_url']): ?>
-                                            <img src="<?php echo htmlspecialchars($related['image_url']); ?>" 
+                                        <?php if (isset($related['image']) && $related['image']): ?>
+                                            <img src="<?php echo htmlspecialchars($related['image']); ?>" 
                                                  class="card-img-top" 
                                                  alt="<?php echo htmlspecialchars($related['name']); ?>">
                                         <?php else: ?>

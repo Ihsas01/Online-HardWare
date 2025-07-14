@@ -40,6 +40,9 @@ function handleAddToCart($conn) {
     $product_id = $_POST['product_id'] ?? '';
     $quantity = $_POST['quantity'] ?? 1;
     
+    // Debug logging
+    error_log("Add to cart request - User ID: $user_id, Product ID: $product_id, Quantity: $quantity");
+    
     if (!$product_id) {
         http_response_code(400);
         echo json_encode(['error' => 'Product ID is required']);
@@ -74,6 +77,7 @@ function handleAddToCart($conn) {
             $stmt->execute([$user_id, $product_id, $quantity]);
         }
 
+        error_log("Product successfully added to cart for user $user_id, product $product_id");
         echo json_encode([
             'success' => true,
             'message' => 'Product added to cart'

@@ -748,19 +748,30 @@ include 'includes/header.php';
 
     // Add to cart functionality
     function addToCart(productId) {
+        console.log('Adding product to cart:', productId);
         const formData = new FormData();
         formData.append('action', 'add_to_cart');
         formData.append('product_id', productId);
         formData.append('quantity', 1);
         
+        console.log('Sending request to php/process_cart.php');
+        
         fetch('php/process_cart.php', {
             method: 'POST',
             body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            console.log('Response status:', response.status);
+            return response.json();
+        })
         .then(data => {
+            console.log('Response data:', data);
             if (data.success) {
                 showNotification('Product added to cart successfully!', 'success');
+                // Optionally refresh the page or update cart count
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else {
                 showNotification('Error: ' + data.error, 'error');
             }

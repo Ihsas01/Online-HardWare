@@ -47,7 +47,9 @@ try {
     $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
     // Get categories for filter
-    $categories = $conn->query("SELECT * FROM categories ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
+    $categories = $conn->query("SELECT c.*, (
+        SELECT COUNT(*) FROM products p WHERE p.category_id = c.id AND p.is_available = 1
+    ) as product_count FROM categories c ORDER BY c.name")->fetchAll(PDO::FETCH_ASSOC);
     
     // Get price range for filter
     $priceRange = $conn->query("SELECT MIN(price) as min_price, MAX(price) as max_price FROM products WHERE is_available = 1")->fetch(PDO::FETCH_ASSOC);

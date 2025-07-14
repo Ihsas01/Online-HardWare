@@ -142,12 +142,12 @@ include 'includes/header.php';
                                     <div class="col-md-6 mb-3">
                                         <label for="name" class="form-label">Full Name</label>
                                         <input type="text" class="form-control" id="name" name="name" 
-                                               value="<?php echo htmlspecialchars($user['name']); ?>" required>
+                                               value="<?php echo htmlspecialchars($user['name'] ?? trim(($user['first_name'] ?? '') . ' ' . ($user['last_name'] ?? ''))); ?>" required>
                                     </div>
                                     <div class="col-md-6 mb-3">
                                         <label for="email" class="form-label">Email</label>
                                         <input type="email" class="form-control" id="email" name="email" 
-                                               value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                                               value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>" required>
                                     </div>
                                 </div>
                                 <div class="mb-3">

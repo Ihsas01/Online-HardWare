@@ -361,15 +361,15 @@ include 'includes/header.php';
                     <div class="contact-details">
                         <div class="contact-item">
                             <span class="label">Address</span>
-                            <span class="value">123 Hardware Street<br>City, State 12345</span>
+                            <span class="value">123 Main Street, Colombo, Sri Lanka</span>
                         </div>
                         <div class="contact-item">
                             <span class="label">Phone</span>
-                            <span class="value">(555) 123-4567</span>
+                            <span class="value">076 xxx xxxx</span>
                         </div>
                         <div class="contact-item">
                             <span class="label">Email</span>
-                            <span class="value"><?php echo ADMIN_EMAIL; ?></span>
+                            <span class="value">mohamedihsas001@gmail.com</span>
                         </div>
                     </div>
                 </div>

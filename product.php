@@ -221,9 +221,9 @@ try {
                 <div class="col-md-4">
                     <h5>Contact Us</h5>
                     <ul class="list-unstyled">
-                        <li><i class="fas fa-phone"></i> (555) 123-4567</li>
-                        <li><i class="fas fa-envelope"></i> <?php echo ADMIN_EMAIL; ?></li>
-                        <li><i class="fas fa-map-marker-alt"></i> 123 Hardware St, City, State</li>
+                        <li><i class="fas fa-phone"></i> 076 xxx xxxx</li>
+                        <li><i class="fas fa-envelope"></i> mohamedihsas001@gmail.com</li>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Main Street, Colombo, Sri Lanka</li>
                     </ul>
                 </div>
             </div>

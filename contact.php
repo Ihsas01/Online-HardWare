@@ -126,7 +126,7 @@ include 'includes/header.php';
                                 </div>
                                 <div class="contact-details">
                                     <h6>Our Location</h6>
-                                    <p>123 Hardware Street, Downtown<br>City, State 12345</p>
+                                    <p>123 Main Street, Colombo, Sri Lanka</p>
                                 </div>
                             </div>
                             
@@ -136,7 +136,7 @@ include 'includes/header.php';
                                 </div>
                                 <div class="contact-details">
                                     <h6>Phone Number</h6>
-                                    <p>(555) 123-4567<br>Mon-Sat: 8:00 AM - 8:00 PM</p>
+                                    <p>076 xxx xxxx<br>Mon-Sat: 8:00 AM - 8:00 PM</p>
                                 </div>
                             </div>
                             
@@ -146,7 +146,7 @@ include 'includes/header.php';
                                 </div>
                                 <div class="contact-details">
                                     <h6>Email Address</h6>
-                                    <p><?php echo ADMIN_EMAIL; ?><br>We respond within 24 hours</p>
+                                    <p>mohamedihsas001@gmail.com<br>We respond within 24 hours</p>
                                 </div>
                             </div>
                             

@@ -320,7 +320,7 @@ include 'includes/header.php';
                                     </div>
                                     <div class="terms-contact-details">
                                         <div class="terms-contact-label">Email Address</div>
-                                        <div class="terms-contact-value"><?php echo ADMIN_EMAIL; ?></div>
+                                        <div class="terms-contact-value">mohamedihsas001@gmail.com</div>
                                     </div>
                                 </div>
                                 
@@ -330,7 +330,7 @@ include 'includes/header.php';
                                     </div>
                                     <div class="terms-contact-details">
                                         <div class="terms-contact-label">Phone Number</div>
-                                        <div class="terms-contact-value">(555) 123-4567</div>
+                                        <div class="terms-contact-value">076 xxx xxxx</div>
                                     </div>
                                 </div>
                                 
@@ -340,7 +340,7 @@ include 'includes/header.php';
                                     </div>
                                     <div class="terms-contact-details">
                                         <div class="terms-contact-label">Business Address</div>
-                                        <div class="terms-contact-value">123 Hardware St, City, State</div>
+                                        <div class="terms-contact-value">123 Main Street, Colombo, Sri Lanka</div>
                                     </div>
                                 </div>
                             </div>

@@ -115,7 +115,7 @@ try {
                         <h1 class="mb-3"><?php echo htmlspecialchars($product['name']); ?></h1>
                         <p class="text-muted mb-3">
                             Category: 
-                            <a href="products.php?category=<?php echo $product['category_id']; ?>">
+                            <a href="#" class="category-instant-link" data-category-id="<?php echo $product['category_id']; ?>">
                                 <?php echo htmlspecialchars($product['category_name']); ?>
                             </a>
                         </p>
@@ -347,5 +347,39 @@ try {
     `;
     document.head.appendChild(style);
     </script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const catLink = document.querySelector('.category-instant-link');
+    if (catLink) {
+        catLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            const catId = this.getAttribute('data-category-id');
+            // Try to find a products grid on this page
+            let productsGrid = document.getElementById('productsGrid');
+            if (productsGrid) {
+                productsGrid.innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+                fetch('products.php?ajax=1&category=' + encodeURIComponent(catId))
+                    .then(r => r.text())
+                    .then(html => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(html, 'text/html');
+                        const newGrid = doc.getElementById('productsGrid');
+                        if (newGrid) {
+                            productsGrid.innerHTML = newGrid.innerHTML;
+                            productsGrid.scrollIntoView({behavior: 'smooth'});
+                        } else {
+                            window.location.href = 'products.php?category=' + encodeURIComponent(catId);
+                        }
+                    })
+                    .catch(() => {
+                        window.location.href = 'products.php?category=' + encodeURIComponent(catId);
+                    });
+            } else {
+                window.location.href = 'products.php?category=' + encodeURIComponent(catId);
+            }
+        });
+    }
+});
+</script>
 </body>
 </html> 

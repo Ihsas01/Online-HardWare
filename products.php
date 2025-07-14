@@ -895,6 +895,24 @@ include 'includes/header.php';
             submitBtn.disabled = false;
         });
     }
+
+    // CATEGORY SIDEBAR AJAX HANDLER
+    document.querySelectorAll('.category-item').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            const categoryId = this.getAttribute('data-category-id');
+            const categoryName = this.getAttribute('data-category-name');
+            // Update products grid via AJAX
+            updateProductsByCategory(categoryId, categoryName);
+            // Update URL without scrolling
+            let url = 'products.php';
+            if (categoryId) url += '?category=' + encodeURIComponent(categoryId);
+            window.history.pushState({}, '', url);
+            // Update active class
+            document.querySelectorAll('.category-item').forEach(function(l) { l.classList.remove('active'); });
+            this.classList.add('active');
+        });
+    });
 </script>
 
 <!-- Hire Tool Modal -->

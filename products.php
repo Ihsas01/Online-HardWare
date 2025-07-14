@@ -252,7 +252,7 @@ include 'includes/header.php';
                         </div>
                         <div class="filter-content">
                             <div class="category-filter">
-                                <a href="#" 
+                                <a href="products.php" 
                                    class="category-item <?php echo !$categoryId ? 'active' : ''; ?>"
                                    data-category-id=""
                                    data-category-name="All Products">
@@ -265,7 +265,7 @@ include 'includes/header.php';
                                     </div>
                                 </a>
                                 <?php foreach ($categories as $category): ?>
-                                    <a href="#" 
+                                    <a href="products.php?category=<?php echo $category['id']; ?>"
                                        class="category-item <?php echo $categoryId === $category['id'] ? 'active' : ''; ?>"
                                        data-category-id="<?php echo $category['id']; ?>"
                                        data-category-name="<?php echo htmlspecialchars($category['name']); ?>">
@@ -520,33 +520,6 @@ include 'includes/header.php';
         offset: 100
     });
 
-    // Function to attach category click listeners
-    function attachCategoryListeners() {
-        document.querySelectorAll('.category-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                e.preventDefault();
-                const categoryId = this.getAttribute('data-category-id');
-                const categoryName = this.getAttribute('data-category-name');
-                // Update active state
-                document.querySelectorAll('.category-item').forEach(cat => cat.classList.remove('active'));
-                this.classList.add('active');
-                // Update URL without page reload
-                const url = new URL(window.location);
-                if (categoryId) {
-                    url.searchParams.set('category', categoryId);
-                } else {
-                    url.searchParams.delete('category');
-                }
-                window.history.pushState({}, '', url);
-                // Update page content
-                updateProductsByCategory(categoryId, categoryName);
-            });
-        });
-    }
-
-    // Call on page load
-    attachCategoryListeners();
-
     // Function to update products by category
     function updateProductsByCategory(categoryId, categoryName) {
         // Show loading state
@@ -593,7 +566,7 @@ include 'includes/header.php';
                     // Reinitialize AOS for new content
                     AOS.refresh();
                     // Re-attach category listeners for new sidebar
-                    attachCategoryListeners();
+                    // attachCategoryListeners(); // This function is no longer needed
                 }
             })
             .catch(error => {

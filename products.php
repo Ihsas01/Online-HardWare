@@ -102,7 +102,6 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
                 echo '<div class="product-actions-footer">';
                 echo '<a href="product.php?id=' . $product['id'] . '" class="btn btn-primary btn-sm">View Details</a>';
                 if (isLoggedIn()) {
-                    echo '<button class="btn btn-outline-primary btn-sm add-to-cart-btn" onclick="addToCart(' . $product['id'] . ')"><i class="fas fa-shopping-cart"></i></button>';
                     echo '<button class="btn btn-success btn-sm hire-tool-btn" onclick="hireTool(' . $product['id'] . ', \'' . addslashes($product['name']) . '\', ' . $product['price'] . ')"><i class="fas fa-calendar-alt"></i> Hire</button>';
                 }
                 echo '</div>';
@@ -439,14 +438,6 @@ include 'includes/header.php';
                                                         View Details
                                                     </a>
                                                     <?php if (isLoggedIn()): ?>
-                                                        <button class="btn btn-outline-primary btn-sm add-to-cart-btn" 
-                                                                onclick="addToCart(<?php echo $product['id']; ?>)">
-                                                            <i class="fas fa-shopping-cart"></i>
-                                                        </button>
-                                                        <button class="btn btn-outline-danger btn-sm add-to-wishlist-btn" 
-                                                                onclick="addToWishlist(<?php echo $product['id']; ?>)">
-                                                            <i class="fas fa-heart"></i>
-                                                        </button>
                                                         <button class="btn btn-success btn-sm hire-tool-btn" 
                                                                 onclick="hireTool(<?php echo $product['id']; ?>, '<?php echo htmlspecialchars($product['name']); ?>', <?php echo $product['price']; ?>)">
                                                             <i class="fas fa-calendar-alt"></i> Hire
